@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:10.3
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: lumen
+      POSTGRES_USER: lumen
+      POSTGRES_DB: lumen
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - db-data:/var/lib/postgresql/data/pgdata
+
+  redis:
+    image: redis:5.0.4
+    ports:
+      - "6379:6379"
+
+volumes:
+  db-data:
+
