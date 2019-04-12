@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Database;
 
+use App\Services\Credentials;
 use App\Services\DistributedConfiguration;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Connectors\ConnectionFactory;
@@ -18,11 +19,17 @@ class CustomConnectionFactory extends ConnectionFactory
      */
     private $configuration;
 
-    public function __construct(Container $container, DistributedConfiguration $configuration)
+    /**
+     * @var Credentials
+     */
+    private $credentials;
+
+    public function __construct(Container $container, DistributedConfiguration $configuration, Credentials $credentials)
     {
         parent::__construct($container);
 
         $this->configuration = $configuration;
+        $this->credentials = $credentials;
     }
 
     protected function parseConfig(array $config, $name)
@@ -34,8 +41,8 @@ class CustomConnectionFactory extends ConnectionFactory
             'host' => $this->configuration->get('database.host'),
             'port' => $this->configuration->get('database.port'),
             'database' => $this->configuration->get('database.database'),
-            'username' => $this->configuration->get('database.username'),
-            'password' => $this->configuration->get('database.password'),
+            'username' => $this->credentials->get('database.username'),
+            'password' => $this->credentials->get('database.password'),
             'charset' => $this->configuration->get('database.charset'),
             'schema' => $this->configuration->get('database.schema'),
         ];
