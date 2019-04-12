@@ -1,21 +1,57 @@
-# Lumen PHP Framework
+# Custom Database Connection Factory
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://poser.pugx.org/laravel/lumen-framework/d/total.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/lumen-framework/v/stable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/lumen-framework/v/unstable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://poser.pugx.org/laravel/lumen-framework/license.svg)](https://packagist.org/packages/laravel/lumen-framework)
+This application is a sample of how one might create a custom database connection
+strategy in Lumen, even require external resource such as Redis to get the connection
+configuration.
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+## Setup
 
-## Official Documentation
+```bash
+composer install
+docker-compose up -d
+```
 
-Documentation for the framework can be found on the [Lumen website](http://lumen.laravel.com/docs).
+## Running
 
-## Security Vulnerabilities
+```bash
+composer run
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+## Testing
 
-## License
+Going to `http://localhost:8000/database` route runs a simple query against the database and
+returns 'Works!' on success or prints the error otherwise.
 
-The Lumen framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+## Parts
+
+### Credentials Service
+
+[A sample service](app/Services/Credentials.php) that stores secure credentials. In the case of this application the store
+is not actually secure - it is just accessing Redis. The same idea could be extended to
+whatever service might store credentials the application may need though.
+
+### Distributed Configuration
+
+[A class](app/Services/DistributedConfiguration.php) that allows accessing configuration stored in a central repository rather than
+directly on our server. In this case, Redis is also being used as our central configuration
+store.
+
+### CustomConnectionFactory
+
+An extension of the standard Laravel `ConnectionFactory` that is injected with the `Credentials`
+and `DistributedConfiguration` services. The `parseConfig` function is overridden to pull the
+configuration values from the two services and return back the new array for the config. All other
+logic is capable of reusing the code already written in the framework's library.
+
+### DatabaseConnectionServiceProvider
+
+A basic service provider with just a `boot` function that extends the `DatabaseManager` to use the
+`CustomConnectionFactory` to make the connection instead of the standard `ConnectionFactory` when
+the `custom` name is provided.
+
+
+## Configuration
+
+While the configuration values in the `database.php` are not actually used for connecting to the
+database, you still must have a `custom` key in your `database.connections` config array, otherwise
+Laravel will throw an error.
