@@ -14,3 +14,13 @@
 $app->get('/', function () use ($app) {
     return $app->version();
 });
+
+$app->get('/database', function () use ($app) {
+    try {
+        app('db')->select('SELECT 1;');
+    } catch (Throwable $t) {
+        return 'Error: ' . $t->getMessage();
+    }
+
+    return 'Worked!';
+});
