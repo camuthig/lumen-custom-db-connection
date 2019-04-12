@@ -9,6 +9,8 @@ configuration.
 ```bash
 composer install
 docker-compose up -d
+# Populate redis with test configuration values
+php artisan configuration:seed
 ```
 
 ## Running
