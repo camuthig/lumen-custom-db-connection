@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\SeedConfiguration;
+use App\Console\Commands\SetConfiguration;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
@@ -13,7 +15,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        SetConfiguration::class,
+        SeedConfiguration::class,
     ];
 
     /**
